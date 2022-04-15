@@ -1,10 +1,15 @@
 import styled from 'styled-components'
-
-const Title = styled.h1`
-  font-size: 50px;
-  color: ${({ theme }) => theme.colors.primary};
-`
-
+import Head from 'next/head'
+import GratitudeApp from "../components/GratitudeApp"
 export default function Home() {
-  return <Title>My page</Title>
+  return <>
+    <Head>
+      <title> Gratitude Journal </title>
+      <link rel="preconnect" href="https://fonts.googleapis.com"/>
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    </Head>
+    <GratitudeApp />
+  
+  </>
 }
