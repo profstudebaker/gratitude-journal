@@ -12,7 +12,7 @@ const test = [
 
 
 export default function GratitudeApp() {
-    const [data, setData] = useState(test);
+    const [data, setData] = useState([]);
     
     const addGratitude = (newGratitude) => {
         setData([...data, newGratitude])
@@ -35,14 +35,17 @@ export default function GratitudeApp() {
                 }
                 <Input addGratitude={addGratitude}/>
                 {
-                    data.length > 0 && 
+                    data.length > 0 ? (
                     <>
                     <DecorativeLineBreak />
                     <History data={data} />
                     <DecorativeLineBreak />
                     <Button onClick={clearGratitudes}>Start Again</Button>
-                    <Spacer height={10} />
-                    </>
+                    <Spacer height={30} />
+                    </> )
+                    : (
+                        <Spacer height={40} />
+                    )
                 }
             </DecorativeArc>
     </Wrapper>
