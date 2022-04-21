@@ -4,6 +4,9 @@ import Input from "./Input";
 import styled from "styled-components"
 import DecorativeLineBreak from "./DecorativeLineBreak";
 
+// use this to test having gratitudes listed
+// so you don't have to keep entering stuff manually
+// by setting it as the default value for useState()
 const test = [
     'finger picked guitar',
     'hot tea',
@@ -16,6 +19,11 @@ export default function GratitudeApp() {
     
     const addGratitude = (newGratitude) => {
         setData([...data, newGratitude])
+    }
+
+    const deleteGratitude = (text) => {
+        let newData = [...data.filter(d => d !== text)]
+        setData(newData)
     }
 
     const clearGratitudes = (e) => setData([]);
@@ -38,7 +46,7 @@ export default function GratitudeApp() {
                     data.length > 0 ? (
                     <>
                     <DecorativeLineBreak />
-                    <History data={data} />
+                    <History data={data} deleteGratitude={deleteGratitude} />
                     <DecorativeLineBreak />
                     <Button onClick={clearGratitudes}>Start Again</Button>
                     <Spacer height={30} />
