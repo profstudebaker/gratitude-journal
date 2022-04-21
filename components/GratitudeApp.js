@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useStickyState } from "../hooks/useStickyState"
 import History from "./History";
 import Input from "./Input";
 import styled from "styled-components"
@@ -12,7 +12,8 @@ const test = [
 
 
 export default function GratitudeApp() {
-    const [data, setData] = useState([]);
+    // instead of just a default value, also provide a key
+    const [data, setData] = useStickyState([], 'gratitudes');
     
     const addGratitude = (newGratitude) => {
         setData([...data, newGratitude])
