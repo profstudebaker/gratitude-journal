@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useStickyState } from "../hooks/useStickyState"
 import History from "./History";
 import Input from "./Input";
 import styled from "styled-components"
@@ -14,8 +14,8 @@ const test = [
 ]
 
 
-export default function GratitudeApp() {
-    const [data, setData] = useState([]);
+export default function GratitudeApp({ user }) {
+    const [data, setData] = useStickyState([], 'gratitudes');
     
     const addGratitude = (newGratitude) => {
         setData([...data, newGratitude])
@@ -27,10 +27,10 @@ export default function GratitudeApp() {
     }
 
     const clearGratitudes = (e) => setData([]);
-
     return <Wrapper>
             <DecorativeArc>
                 <Title>Gratitude Journal</Title>
+                <p>Hello, {user.email}</p>
                 {
                     data.length === 0 &&
                     <>
@@ -68,7 +68,6 @@ const Wrapper = styled.main`
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 30px max(10px, 10%);
 `
 
 const Column = styled.div`
