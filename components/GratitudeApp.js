@@ -1,4 +1,6 @@
 import { useStickyState } from "../hooks/useStickyState"
+import { useState, useEffect } from "react"
+import { supabase } from "../lib/supabase"
 import History from "./History";
 import Input from "./Input";
 import styled from "styled-components"
@@ -15,10 +17,50 @@ const test = [
 
 
 export default function GratitudeApp({ user }) {
-    const [data, setData] = useStickyState([], 'gratitudes');
-    
-    const addGratitude = (newGratitude) => {
-        setData([...data, newGratitude])
+    // const [data, setData] = useStickyState([], 'gratitudes');
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(true);
+
+    useEffect(() => {
+        fetchGratitudes();
+    }, [data])
+
+    const fetchGratitudes = async () => {
+        let { data, error } = await supabase
+            .from('gratitudes')
+            .select('entry, date_insert_ts')
+
+        if (error) setError(error.message)
+        else {
+            /**
+             * Calculate if the most recent submission was within the same day (24hrs)
+             * This is so if a user refreshes or closes out of the page
+             * our greeting component will still highlight the day's submission. 
+             * If they come back after a day has passed since submitting, it will
+             * display the input form again.
+             */
+            setData(data)
+            setLoading(false)
+        }
+      }
+
+
+
+    const addGratitude = async (newGratitude) => {
+        setLoading(true)
+        if (newGratitude.length) {
+            let { data, error } = await supabase
+              .from('gratitudes')
+              .insert([
+              { id: user.id, entry: newGratitude },
+              ])
+            if (error) setError(error.message)
+            else { 
+                // setGratitudes([...gratitudes, {'entry':entry,'date_insert_ts':'NULL'}])
+                setLoading(false)
+            }
+          }
     }
 
     const deleteGratitude = (text) => {
@@ -27,12 +69,17 @@ export default function GratitudeApp({ user }) {
     }
 
     const clearGratitudes = (e) => setData([]);
+
+    if (loading) {
+        return <p>Loading...</p>
+    }
+
     return <Wrapper>
             <DecorativeArc>
                 <Title>Gratitude Journal</Title>
                 <p>Hello, {user.email}</p>
                 {
-                    data.length === 0 &&
+                    (data.length === 0 && !loading) &&
                     <>
                     <ImageWrapper>
                     <img src="https://i.pinimg.com/originals/77/d0/a7/77d0a7c454e658833800528e748edbe9.png" alt="Illustration of woman meditating" />

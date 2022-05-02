@@ -5,8 +5,8 @@ export default function History({ data, deleteGratitude }) {
         {
             data.length > 0 ?
             (data.map((d, i) => (
-                <Entry key={d} onClick={() => deleteGratitude(d)}>
-                    {d}
+                <Entry key={d.date_insert_ts} onClick={() => deleteGratitude(d.entry)}>
+                    {d.entry}
                 </Entry>
             ))) : (
                 <p>No gratitudes.</p>
