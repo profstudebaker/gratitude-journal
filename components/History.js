@@ -1,11 +1,11 @@
 import styled from "styled-components"
 
-export default function History({ data, deleteGratitude }) {
+export default function History({ data }) {
     return (<List>
         {
             data.length > 0 ?
             (data.map((d, i) => (
-                <Entry key={d} onClick={() => deleteGratitude(d)}>
+                <Entry key={d} >
                     {d}
                 </Entry>
             ))) : (

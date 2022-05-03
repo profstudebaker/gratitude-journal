@@ -14,9 +14,15 @@ export default function Input({ addGratitude }) {
         <Form onSubmit={handleSubmit}>
             <label htmlFor="new-gratitude">Add a Gratitude</label>
             <input id="new-gratitude" value={value} onChange={(e) => setValue(e.target.value)}/>
+            <Spacer height={10} />
+            <button type="submit">Give Thanks</button>
         </Form>
     )
 }
+
+const Spacer = styled.div`
+    height: ${p => p.height};
+`
 
 const Form = styled.form`
     font-size: 1.4rem;
@@ -29,9 +35,12 @@ const Form = styled.form`
         padding: 5px;
     }
 
-    input {
+    input, button {
         background: transparent;
         font-size: inherit;
+        color: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
         padding: 10px;
         border: 3px solid var(--burnt);
         border-radius: 5px;

@@ -1,4 +1,5 @@
-import { useStickyState } from "../hooks/useStickyState"
+import { useState, useEffect } from "react"
+import { supabase } from "../lib/supabase"
 import History from "./History";
 import Input from "./Input";
 import styled from "styled-components"
@@ -15,18 +16,69 @@ const test = [
 
 
 export default function GratitudeApp({ user }) {
-    const [data, setData] = useStickyState([], 'gratitudes');
-    
-    const addGratitude = (newGratitude) => {
-        setData([...data, newGratitude])
+    const [data, setData] = useState([]);
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(true)
+  
+    useEffect(() => {
+      fetchGratitudes()
+    }, [loading] /* re-fetch gratitudes when we setLoading == true */)
+  
+    const fetchGratitudes = async () => {
+      let { data: gratitudes, error } = await supabase
+          .from('gratitudes')
+          .select('*')
+      if (error) setError(error.message)
+      else {
+          /**
+           * Calculate if the most recent submission was within the same day (24hrs)
+           * This is so if a user refreshes or closes out of the page
+           * our greeting component will still highlight the day's submission. 
+           * If they come back after a day has passed since submitting, it will
+           * display the input form again.
+           */
+          setData(gratitudes)
+          setLoading(false)
+      }
     }
-
-    const deleteGratitude = (text) => {
-        let newData = [...data.filter(d => d !== text)]
-        setData(newData)
+  
+    const addGratitude = async (entry) => {
+      /**
+       * Sends a gratitude to our Supabase table
+       * and triggers a re-run of our gratitude fetching,
+       * so that the client updates with this new gratitude.
+       */
+      if (entry.length) {
+        setLoading(true)
+        let { data, error } = await supabase
+          .from('gratitudes')
+          .insert([
+          { id: user.id, entry: entry },
+          ])
+        if (error) setError(error.message)
+        else { 
+            setLoading(false)
+        }
+      }
     }
 
     const clearGratitudes = (e) => setData([]);
+
+    if (loading) {
+        return <Wrapper>
+            <DecorativeArc>
+                <Title>Gratitude Journal</Title>
+                <p>Hello, {user.email}</p>
+                <p>Loading...</p>
+                </DecorativeArc>
+            </Wrapper>
+    }
+
+    if (error) {
+        return <Wrapper>{JSON.stringify(error)}</Wrapper>
+    }
+
+
     return <Wrapper>
             <DecorativeArc>
                 <Title>Gratitude Journal</Title>
@@ -46,9 +98,9 @@ export default function GratitudeApp({ user }) {
                     data.length > 0 ? (
                     <>
                     <DecorativeLineBreak />
-                    <History data={data} deleteGratitude={deleteGratitude} />
+                    <History data={data.map(d => d.entry)} />
                     <DecorativeLineBreak />
-                    <Button onClick={clearGratitudes}>Start Again</Button>
+                    {/* <Button onClick={clearGratitudes}>Start Again</Button> */}
                     <Spacer height={30} />
                     </> )
                     : (
