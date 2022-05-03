@@ -4,16 +4,18 @@ import GratitudeApp from "../components/GratitudeApp"
 import { supabase } from '../lib/supabase'
 import { Auth } from '@supabase/ui'
 import { useSession } from '../context/user-context'
-import useSWR from "swr"
+import useSWR, { SWRConfig } from "swr"
+import { useRouter } from 'next/router'
 
 // a reusable function to pass in to swr, like in our weather app example
 // it just fetches the parameter and returns the result as json
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
-export default function Home({ gratitudes }) {
+export default function Home({ fallback }) {
   // use our Context hook to get info about the current session 
   // including logged in user
   const { session } = useSession()
+  const router = useRouter()
   // setting up SWR on our gratitudes endpoint, but this time we have a mutate function
   // that will allow us to perform optimistic UI updates when a user
   // adds a new gratitude
@@ -47,36 +49,34 @@ export default function Home({ gratitudes }) {
     return <Wrapper>Loading...</Wrapper>
   }
 
-  return <Wrapper>
+  if(!session) {
+    router.push('/signin')
+  } else {
+  return (
+  <SWRConfig value ={{ fallback }}>
+  <Wrapper>
     <Head>
       <title> Gratitude Journal </title>
       <link rel="preconnect" href="https://fonts.googleapis.com"/>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
     </Head>
-      {/* 
-				* Check if user is logged in or not. 
-				* If not, display the login UI
-				* If logged in, display the app 
-				* & pass the user in as props
-				*/
-        !session ? (
+      {
           <Content>
-            <h1> not logged in </h1>
-            </Content>
-        ) : (
-          <Content>
-            <GratitudeApp user={session.user} data={data} addGratitude={addGratitude} deleteAll={deleteAll} />
+            <GratitudeApp user={session.user} data={data} addGratitude={addGratitude} />
             <LogoutButton
               onClick={async () => {
                 const { error } = await supabase.auth.signOut()
+                router.push('/signin')
                 if (error) console.log('Error logging out:', error.message)
               }}
             >
               Logout
             </LogoutButton>
           </Content>
-        )}
+        }
   </Wrapper>
+  </SWRConfig>
+  )}
 }
 
 export const getServerSideProps = async (context) => {
@@ -117,26 +117,6 @@ export const getServerSideProps = async (context) => {
     }
   }
 }
-
-const StyledAuth = styled(Auth)`
-  .sbui-btn {
-    background-color: var(--rose);
-  }
-  .sbui-btn:hover {
-    background-color: var(--rose);
-  }
-
-  label {
-    color: var(--parchment);
-  }
-
-  .sbui-typography-link {
-    color: var(--parchment);
-  }
-  .sbui-typography-text {
-    color: var(--parchment);
-  }
-`
 
 const Wrapper = styled.div`
   display: flex;

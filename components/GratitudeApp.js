@@ -1,12 +1,9 @@
-import { useStickyState } from "../hooks/useStickyState"
 import History from "./History";
 import Input from "./Input";
 import styled from "styled-components"
 import DecorativeLineBreak from "./DecorativeLineBreak";
 
-export default function GratitudeApp({ user, data, addGratitude, deleteAll }) {
-    // const [data, setData] = useStickyState([], 'gratitudes');
-
+export default function GratitudeApp({ user, data, addGratitude }) {
     const deleteGratitude = (text) => {
         let newData = [...data.filter(d => d !== text)]
         setData(newData)
@@ -33,7 +30,6 @@ export default function GratitudeApp({ user, data, addGratitude, deleteAll }) {
                     <DecorativeLineBreak />
                     <History data={data.map(d => d.entry)} deleteGratitude={deleteGratitude} />
                     <DecorativeLineBreak />
-                    <Button onClick={deleteAll}>Start Again</Button>
                     <Spacer height={30} />
                     </> )
                     : (

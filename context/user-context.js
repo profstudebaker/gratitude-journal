@@ -12,6 +12,8 @@ export const UserContext = createContext(null);
 
 // UserContextProvider is the parent element of the entire application
 export function UserContextProvider(props) {
+  // we store the session inside state here, and expose the value through 
+  // our hook below
   const [session, setSession] = useState(null)
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function UserContextProvider(props) {
       })
     });
 
+    // our clean up function
     return () => {
       authListener?.unsubscribe();
     };

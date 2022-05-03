@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import AuthForm from '../components/AuthForm'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
+import styled from 'styled-components'
 
 export default function Signin() {
   const [email, setEmail] = useState('')
@@ -21,27 +22,28 @@ export default function Signin() {
   }
 
   return (
-    <>
-      <h1>Sign in</h1>
-      <AuthForm
-        email={email}
-        onEmailChange={(evt) => setEmail(evt.target.value)}
-        password={password}
-        onPasswordChange={(evt) => setPassword(evt.target.value)}
-        onSubmit={submitForm}
-      />
+    <Wrapper>
+        <Content>
+        <Title>Gratitude Journal</Title>
+        <AuthForm
+            email={email}
+            onEmailChange={(evt) => setEmail(evt.target.value)}
+            password={password}
+            onPasswordChange={(evt) => setPassword(evt.target.value)}
+            onSubmit={submitForm}
+        />
 
-      <Link href='/signup'>
-        <a>Sign up</a>
-      </Link>
-    </>
+        <Link href='/signup'>
+            Already logged in? Sign up
+        </Link>
+      </Content>
+    </Wrapper>
   )
 }
 
 export const getServerSideProps = async (context) => {
   // get the user using the "sb:token" cookie
   const { user } = await supabase.auth.api.getUserByCookie(context.req)
-  console.log('user', user)
   if (user) {
     return {
       redirect: {
@@ -55,3 +57,27 @@ export const getServerSideProps = async (context) => {
     props: {}
   }
 }
+
+const Title = styled.h1`
+    font-size: 4rem;
+    text-transform: none;
+    letter-spacing: 0px;
+    line-height: 1;
+    font-family: 'Lalezar', serif;
+    text-align: center;
+`
+
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
+
+const Content = styled.div`
+  padding-top: 50px;
+  flex: 1;
+  max-width: min(100%, 900px);
+`
