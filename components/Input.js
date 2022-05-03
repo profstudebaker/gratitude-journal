@@ -6,7 +6,10 @@ export default function Input({ addGratitude }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        addGratitude(value);
+
+        if (value.length > 0) {
+            addGratitude(value);
+        }
         setValue("");
     }
 

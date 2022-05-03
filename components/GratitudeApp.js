@@ -4,29 +4,14 @@ import Input from "./Input";
 import styled from "styled-components"
 import DecorativeLineBreak from "./DecorativeLineBreak";
 
-// use this to test having gratitudes listed
-// so you don't have to keep entering stuff manually
-// by setting it as the default value for useState()
-const test = [
-    'finger picked guitar',
-    'hot tea',
-    'birdsong'
-]
-
-
-export default function GratitudeApp({ user }) {
-    const [data, setData] = useStickyState([], 'gratitudes');
-    
-    const addGratitude = (newGratitude) => {
-        setData([...data, newGratitude])
-    }
+export default function GratitudeApp({ user, data, addGratitude, deleteAll }) {
+    // const [data, setData] = useStickyState([], 'gratitudes');
 
     const deleteGratitude = (text) => {
         let newData = [...data.filter(d => d !== text)]
         setData(newData)
     }
 
-    const clearGratitudes = (e) => setData([]);
     return <Wrapper>
             <DecorativeArc>
                 <Title>Gratitude Journal</Title>
@@ -46,9 +31,9 @@ export default function GratitudeApp({ user }) {
                     data.length > 0 ? (
                     <>
                     <DecorativeLineBreak />
-                    <History data={data} deleteGratitude={deleteGratitude} />
+                    <History data={data.map(d => d.entry)} deleteGratitude={deleteGratitude} />
                     <DecorativeLineBreak />
-                    <Button onClick={clearGratitudes}>Start Again</Button>
+                    <Button onClick={deleteAll}>Start Again</Button>
                     <Spacer height={30} />
                     </> )
                     : (

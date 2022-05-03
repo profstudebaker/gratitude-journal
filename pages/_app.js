@@ -1,7 +1,9 @@
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import styled from "styled-components"
 import { supabase } from '../lib/supabase'
-import { Auth } from '@supabase/ui'
+// import { Auth } from '@supabase/ui'
+import { UserContextProvider } from '../context/user-context'
+
 
 const GlobalStyle = createGlobalStyle`
   html, body, #__next {
@@ -46,12 +48,12 @@ const Overlay = styled.div`
 
 export default function App({ Component, pageProps }) {
   return (
-    <Auth.UserContextProvider supabaseClient={supabase}>
+    <UserContextProvider>
       <GlobalStyle />
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
       </ThemeProvider>
       <Overlay />
-    </Auth.UserContextProvider>
+    </UserContextProvider>
   )
 }
