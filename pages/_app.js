@@ -1,7 +1,5 @@
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import styled from "styled-components"
-import { supabase } from '../lib/supabase'
-// import { Auth } from '@supabase/ui'
 import { UserContextProvider } from '../context/user-context'
 
 
@@ -28,12 +26,6 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
-const theme = {
-  colors: {
-    primary: '#0070f3',
-  },
-}
-
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -47,12 +39,17 @@ const Overlay = styled.div`
 `
 
 export default function App({ Component, pageProps }) {
+  /* 
+    We wrap out entire app inside our UserContextProvider,
+    so we can use our useSession hook anywhere in the component tree
+
+    Without context, we would have to pass down the session object
+    through every single component that uses it
+  */
   return (
     <UserContextProvider>
       <GlobalStyle />
-      <ThemeProvider theme={theme}>
         <Component {...pageProps} />
-      </ThemeProvider>
       <Overlay />
     </UserContextProvider>
   )

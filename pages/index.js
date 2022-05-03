@@ -6,10 +6,17 @@ import { Auth } from '@supabase/ui'
 import { useSession } from '../context/user-context'
 import useSWR from "swr"
 
+// a reusable function to pass in to swr, like in our weather app example
+// it just fetches the parameter and returns the result as json
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function Home({ gratitudes }) {
+  // use our Context hook to get info about the current session 
+  // including logged in user
   const { session } = useSession()
+  // setting up SWR on our gratitudes endpoint, but this time we have a mutate function
+  // that will allow us to perform optimistic UI updates when a user
+  // adds a new gratitude
   const { data, error, mutate } = useSWR(
     "/api/gratitudes",
     fetcher
@@ -17,10 +24,8 @@ export default function Home({ gratitudes }) {
 
   async function addGratitude(entry) {
     try {
-      // Update the local state immediately and fire the
-      // request. Since the API will return the updated
-      // data, there is no need to start a new revalidation
-      // and we can directly populate the cache.
+      // Update the local state immediately and fire the request
+      // passing in the entered value as a query parameter
       await mutate(fetch(`/api/gratitudes/add/?entry=${entry}`), {
         optimisticData: [...data, entry],
         rollbackOnError: true,
@@ -34,33 +39,7 @@ export default function Home({ gratitudes }) {
     }
   }
 
-  async function deleteAll() {
-    const { data, error } = await supabase
-        .from('gratitudes')
-        .delete()
-        .eq("entry", "iced coffee");
-
-    console.log("dispacthed the delete")
-    console.log('error: ', error)
-    // try {
-    //   // Update the local state immediately and fire the
-    //   // request. Since the API will return the updated
-    //   // data, there is no need to start a new revalidation
-    //   // and we can directly populate the cache.
-    //   await mutate(fetch(`/api/gratitudes/delete`), {
-    //     optimisticData: [],
-    //     rollbackOnError: true,
-    //     populateCache: false,
-    //     revalidate: true
-    //   });
-    // } catch (e) {
-    //   // If the API errors, the original data will be
-    //   // rolled back by SWR automatically.
-    //   console.log("ERROR!")
-    // }
-  }
-
-  if(error) {
+  if (error) {
     return<Wrapper>{error.message}</Wrapper>
   }
 
@@ -101,8 +80,11 @@ export default function Home({ gratitudes }) {
 }
 
 export const getServerSideProps = async (context) => {
-  // get the user using the "sb:token" cookie
+  // get the user using the auth cookie
   const { user } = await supabase.auth.api.getUserByCookie(context.req)
+
+  // if no user is logged in when we send a request for this page,
+  // redirect from this page to the signin page automatically
   if (!user) {
     return {
       redirect: {
@@ -111,7 +93,13 @@ export const getServerSideProps = async (context) => {
       }
     }
   }
+
+  // if we do have a logged in user, tell supabase who it is
   supabase.auth.setAuth(context.req.cookies["sb-access-token"])
+  // then we can make our call to the database using supabase api methods
+  // we don't need to filter for the user
+  // because Row Level Security is enabled and automatically adds
+  // a "WHERE id = this.user.id" type clause onto our queries
   const { data: gratitudes, error } = await supabase
     .from('gratitudes')
     .select('*')
@@ -122,6 +110,7 @@ export const getServerSideProps = async (context) => {
     }
   }
 
+  // send the gratitudes as our default info to the Home Page
   return {
     props: {
       gratitudes
