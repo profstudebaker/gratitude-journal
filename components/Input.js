@@ -21,7 +21,7 @@ export default function Input({ addGratitude }) {
 }
 
 const Spacer = styled.div`
-    height: ${p => p.height};
+    height: ${p => p.height}px;
 `
 
 const Form = styled.form`
