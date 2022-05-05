@@ -30,13 +30,6 @@ export default function GratitudeApp({ user }) {
           .select('*')
       if (error) setError(error.message)
       else {
-          /**
-           * Calculate if the most recent submission was within the same day (24hrs)
-           * This is so if a user refreshes or closes out of the page
-           * our greeting component will still highlight the day's submission. 
-           * If they come back after a day has passed since submitting, it will
-           * display the input form again.
-           */
           setData(gratitudes)
           setLoading(false)
       }
